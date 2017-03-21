@@ -4,14 +4,18 @@
 //ARCHORg mp 
 
 import java.util.*;
+
 public class mp2{
 	private String finalAnswer;
+	
 	public mp2(){
 		finalAnswer = "";
 	}
+	
 	public String getFinalAnswer(){
 		return finalAnswer;
 	}
+	
 	public void appendToAnswer(String s){
 		finalAnswer = finalAnswer + s;
 	}
@@ -36,12 +40,14 @@ public class mp2{
 
 
 	}
+	
 	public void decToBinary(Double d){
 		System.out.println("decToBinary received: " + d);
 		StringBuilder sb = new StringBuilder();
 
 
 	}
+	
 	private char quadToHex(String s){
 		switch(s){
 			case "0000": return '0';
@@ -57,11 +63,13 @@ public class mp2{
 			case "1010": return 'A';
 			case "1011": return 'B';
 			case "1100": return 'C';
-			case "1101": return 'E';
-			case "1110": return 'D';
-			case "1111": return 'F';
+			case "1101": return 'D';
+			case "1110": return 'E';
+			default: return 'E';
+			//case "1111": return 'F';
 		}
 	}
+	
 	//recieves a 32 bit 
 	public void binaryToHex(String s){
 		System.out.println("binaryToHex received: " + s);
@@ -74,9 +82,8 @@ public class mp2{
 		for(int i = 0 ; i < 32 ; i+=4){
 			 
 		}
-
-
 	}
+	
 	//recieves string with length of 12 to be converted to 10
 	public String toDenselyPacked(String s){
 		char[] arr = new char[10];
