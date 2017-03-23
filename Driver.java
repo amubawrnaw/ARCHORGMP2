@@ -13,5 +13,6 @@ public class Driver {
 		
 		c.split(input);
 		c.convert();
+		System.out.println(c.getAnswer());
 	}
 }

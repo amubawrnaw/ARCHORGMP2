@@ -125,19 +125,47 @@ public class Converter {
 		//Lord have mercy
 	}
 	
+	public void checkSign() {
+		SBit = Integer.toString(sign);
+	}
+	
+	public void checkECBit() {
+		ECBit = ePrimeBinary.substring(2);
+	}
+	
+	public void checkCBit() {
+		if (firstDigit.length() == 3) {
+			CBit = ePrimeBinary.substring(0, 2) + firstDigit;
+		} else {
+			CBit = "11" + ePrimeBinary.substring(0, 2) + firstDigit;
+		}
+	}
+	
 	public void convert() {
-		checkFirstDigit();
-		ArrayList<String> BCD = convertMantissaBCD();
+		checkSign();
 		computeEPrime();
 		ePrimeToBinary();
-		
+		checkECBit();
+		checkFirstDigit();
+		ArrayList<String> BCD = convertMantissaBCD();
+		MCBit = convertMantissa(BCD);
+		checkCBit();
 		/*
 		mantissa = toDenselyPacked(mantissa);
 		computeCBit();
 		//computeECBit
 		//computeMCBit
-		assembleAnswer();
+		
 		*/
+		assembleAnswer();
+	}
+	
+	public String convertMantissa(ArrayList<String> BCD) {
+		ArrayList<String> packedBCD = new ArrayList<String>();
+		for (int i = 0; i < BCD.size(); i++) {
+			packedBCD.add(toDenselyPacked(BCD.get(i)));
+		}
+		return packedBCD.get(0) + packedBCD.get(1);
 	}
 	
 	public void checkFirstDigit() {
