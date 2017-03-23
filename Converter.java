@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Converter {
@@ -8,6 +9,7 @@ public class Converter {
 	private String decimal;
 	private String finalAnswer;
 	private String mantissa;
+	private String firstDigit;
 	private String SBit;
 	private String CBit;
 	private String ECBit;
@@ -24,6 +26,9 @@ public class Converter {
 	}
 	
 	public String getAnswer() { return finalAnswer; }
+	public String getMantissa() { return mantissa; }
+	public String getEPrimeBinary() { return ePrimeBinary; }
+	public int getExponent() { return exponent; }
 	
 	private void assembleAnswer() {
 		finalAnswer += SBit;
@@ -36,14 +41,15 @@ public class Converter {
 		finalAnswer += " ";
 	}
 	
-	private void checkDecimalPoint(Double number) {
+	private void Normalize(Double number) {
 		//moves decimal point to the right if it has decimal portion
 		while (number % 1 != 0) {
 			exponent--;
 			number *= 10;
 		}
 		
-		mantissa = number.toString();
+		int num = number.intValue();
+		mantissa = Integer.toString(num);
 		
 		while(mantissa.length() < 7) {
 			mantissa = "0" + mantissa;
@@ -60,24 +66,19 @@ public class Converter {
 		return false;			
 	}
 	
-	private boolean isEmpty(String[] a, String[] b) {
-		if (a.length == 1 || b.length == 1) {
+	private boolean isNotEmpty(String[] a, String[] b) {
+		if (a.length == 2 || b.length == 2) {
 			return true;
 		}
 		return false;
 	}
 	
 	private void parseExponent(String expression) {
-		for (int i = 0; i < expression.length() - 2; i++) {
-			if (expression.substring(i, i + 2) == "10") {
-				exponent = Integer.parseInt(expression.substring(i + 3));
-				break;
-			}
-		}
+		exponent = Integer.parseInt(expression.substring(3));
 	}
 	
 	private String[] returnArray(String[] a, String[] b) {
-		if (a.length == 1)
+		if (a.length == 2)
 			return a;
 		return b;
 	}
@@ -91,7 +92,7 @@ public class Converter {
 		String[] inputX = expression.split("X");
 		String[] input;
 		
-		if(!isEmpty(inputx, inputX)) {
+		if(isNotEmpty(inputx, inputX)) {
 			input = returnArray(inputx, inputX);
 			parseExponent(input[1]);
 		} else {
@@ -99,7 +100,7 @@ public class Converter {
 			input[0] = expression;
 		}
 		
-		checkDecimalPoint(Double.parseDouble(input[0]));
+		Normalize(Double.parseDouble(input[0]));
 	}
 	
 	private void computeEPrime() {
@@ -125,14 +126,87 @@ public class Converter {
 	}
 	
 	public void convert() {
-		//convert mantissa to BCD
+		checkFirstDigit();
+		ArrayList<String> BCD = convertMantissaBCD();
 		computeEPrime();
 		ePrimeToBinary();
+		
+		/*
 		mantissa = toDenselyPacked(mantissa);
 		computeCBit();
 		//computeECBit
 		//computeMCBit
 		assembleAnswer();
+		*/
+	}
+	
+	public void checkFirstDigit() {
+		char first = cutFirst();
+		if (isSmall(first)) {
+			firstDigit = smallFirstDigit(first);
+		} else {
+			firstDigit = bigFirstDigit(first);
+		}
+	}
+	
+	public boolean isSmall(char first) {
+		if (first == 0 || first == 1 || first == 2 || first == 3 || first == 4 || first == 5 || first == 6 || first == 7)
+			return true;
+		return false;
+	}
+	
+	public ArrayList<String> convertMantissaBCD() {
+		String a = mantissa.substring(0, 3), b = mantissa.substring(3);
+		String aBCD = "", bBCD = "";
+		ArrayList<String> BCD = new ArrayList<String>();
+		for (int i = 0; i < 3; i++) {
+			aBCD = aBCD + toBCD(a.charAt(i));
+			bBCD = bBCD + toBCD(b.charAt(i));
+		}
+		BCD.add(aBCD);
+		BCD.add(bBCD);
+		return BCD;
+	}
+	
+	public String toBCD(char a) {
+		switch(a) {
+		case '0': return "0000";
+		case '1': return "0001";
+		case '2': return "0010";
+		case '3': return "0011";
+		case '4': return "0100";
+		case '5': return "0101";
+		case '6': return "0110";
+		case '7': return "0111";
+		case '8': return "1000";
+		default: return "1001";
+		}
+	}
+	
+	public char cutFirst() {
+		char c = mantissa.charAt(0);
+		mantissa = mantissa.substring(1);
+		return c;
+	}
+	
+	public String bigFirstDigit(char first) {
+		switch(first) {
+		case '8': return "0";
+		default: return "1";
+		}
+	}
+	
+	public String smallFirstDigit(char first) {
+		switch(first) {
+		case '0': return "000";
+		case '1': return "001";
+		case '2': return "010";
+		case '3': return "011";
+		case '4': return "100";
+		case '5': return "101";
+		case '6': return "110";
+		default: return "111";
+		}
 	}
 	
 	//recieves string with length of 12 to be converted to 10
